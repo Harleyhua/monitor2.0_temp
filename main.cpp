@@ -4,7 +4,7 @@
 #include "sys_mg/cm_mg.h"
 #include "QsLog/include/QsLog.h"
 
-#define VERSION "软件版本2.21"
+#define VERSION "软件版本2.22"
 
 int main(int argc, char *argv[])
 {

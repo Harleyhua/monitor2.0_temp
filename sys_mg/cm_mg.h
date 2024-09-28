@@ -33,6 +33,8 @@
 //room-2
 #define SLAVE_IP_2   ("192.168.31.6")
 #define SLAVE_PORT_2    8000
+#define CS_ROOM_TEMP_REQUEST "4001"
+#define CS_ROOM_TEMP_RESPON  "4002"
 
 typedef struct
 {
@@ -54,6 +56,7 @@ public:
     QByteArray m_buff;
     tcp_socket *m_server_socket;
     modbus_t* m_ctx = NULL;
+	modbus_t* m_ctx_2 = NULL;
 
     QByteArray cache;
 
@@ -88,6 +91,7 @@ public:
     void send_cs_msg(QJsonObject &obj,QString cmd);
     void cs_communicate_encode(QByteArray &buffer,QString cmd,QString status);   //客户端协议封包
     void tcp_rev();
+	void onTcpReadyRead();
 
     //2.0
     // void http_send(quint32 timeout, QString url, QJsonObject param);

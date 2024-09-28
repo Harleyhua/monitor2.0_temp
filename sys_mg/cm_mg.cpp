@@ -23,7 +23,7 @@ cm_mg::cm_mg(QObject *parent)
     m_ctx = modbus_new_tcp("127.0.0.1",8000);
 #else
     m_ctx = modbus_new_tcp(SLAVE_IP,SLAVE_PORT);
-    m_ctx = modbus_new_tcp(SLAVE_IP_2,SLAVE_PORT_2);
+    m_ctx_2 = modbus_new_tcp(SLAVE_IP_2,SLAVE_PORT_2);
 #endif
 
     int ret = -1;
@@ -45,6 +45,25 @@ cm_mg::cm_mg(QObject *parent)
         }
     }
 
+//room-2
+    int ret_2 = -1;
+    if (NULL == m_ctx_2)
+    {
+
+        QLOG_INFO() << "新建modbus tcp失败";
+    }
+    else
+    {
+        int rc = modbus_set_slave(m_ctx_2,1);
+        if(rc == -1)
+        {
+            QLOG_INFO() << "设置slave的地址失败";
+            modbus_free(m_ctx_2);
+        }
+        else {
+
+        }
+    }
     connect(m_server_socket,&tcp_socket::readyRead,this,&cm_mg::tcp_rev);
 }
 
@@ -134,7 +153,7 @@ bool cm_mg::col_room_2_temp()
     room_strc status;
 
     int ret = -1;
-    ret = modbus_connect(m_ctx);
+    ret = modbus_connect(m_ctx_2);
     if(ret == -1)
     {
         QLOG_INFO() << "room-2 连接salve错误";
@@ -145,7 +164,7 @@ bool cm_mg::col_room_2_temp()
     }
     else
     {
-        if(modbus_read_registers(m_ctx,7990,35,buff) != -1)
+        if(modbus_read_registers(m_ctx_2,7990,35,buff) != -1)
         {
 
             status.room_name = "room-2";
@@ -180,7 +199,7 @@ bool cm_mg::col_room_2_temp()
         {
             QLOG_INFO() << "room-2 无法读取";
         }
-        modbus_close(m_ctx);
+        modbus_close(m_ctx_2);
     }
 
     return true;
@@ -265,6 +284,7 @@ void cm_mg::create_room_2_temp_js(room_strc status)
     send_cs_msg(root_js,CS_ROOM_TEMP_REQUEST);
 }
 
+
 void cm_mg::send_cs_msg(QJsonObject &root_js, QString cmd)
 {
     QByteArray msg;
@@ -286,6 +306,7 @@ void cm_mg::cs_communicate_encode(QByteArray &buffer, QString cmd, QString statu
     buffer.insert(8,cmd.toUtf8());
     buffer.insert(12,status.toUtf8());
     buffer.insert(16,QString("%1").arg(length,11,10,QLatin1Char('0')).toUtf8());
+	
 }
 
 /*
@@ -403,23 +424,31 @@ void cm_mg::onm_new_timer()
 
     m_timer_2 = new QTimer();
     connect(m_timer_2,&QTimer::timeout,this,&cm_mg::onm_timer_callback_2);
-    m_timer_2->start(20000);
+    m_timer_2->start(30000);
 }
 
 void cm_mg::tcp_rev()
 {
-    // 设置超时时间为5000毫秒
-    if (m_server_socket->waitForReadyRead(5000))
+    QByteArray Data = m_server_socket->readAll();
+    QLOG_INFO() << "Received TCP data:" << Data;
+
+    QJsonParseError jsonError;
+    QJsonObject jsonObj = QJsonDocument::fromJson(Data, &jsonError).object();
+
+    if (jsonError.error != QJsonParseError::NoError)
     {
-        m_buff.append(m_server_socket->readAll());
-        qDebug() << m_buff.size();
-        while (m_buff.size() > 0)
-        {
-            QLOG_INFO() << "服务器返回正常";
-        }
+        QLOG_INFO() << "JSON解析失败:" << jsonError.errorString();
+        return;
     }
-    else
+
+    int statusCode = jsonObj.value("status_code").toInt(-1);
+
+    // 检查状态码
+    if (statusCode == 200)
     {
-        qDebug() << "读取数据超时";
+        QLOG_INFO() << "服务器返回正常";
+    } else
+    {
+        QLOG_INFO() << "服务器返回异常，状态码:" << statusCode;
     }
 }

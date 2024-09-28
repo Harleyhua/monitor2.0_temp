@@ -40,7 +40,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 RC_ICONS = temp.ico
 
 #程序版本
-VERSION = 0.2.2.1
+VERSION = 0.2.2.2
 
 #程序名称
 QMAKE_TARGET_PRODUCT = "monitor_temp"
