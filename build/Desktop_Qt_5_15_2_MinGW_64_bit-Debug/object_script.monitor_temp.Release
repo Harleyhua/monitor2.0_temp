@@ -1,0 +1,15 @@
+release/modbus.o
+release/modbus-data.o
+release/modbus-rtu.o
+release/modbus-tcp.o
+release/tcp_socket.o
+release/common.o
+release/main.o
+release/mainwindow.o
+release/cm_mg.o
+release/data_mg.o
+release/moc_tcp_socket.o
+release/moc_common.o
+release/moc_mainwindow.o
+release/moc_cm_mg.o
+release/moc_data_mg.o

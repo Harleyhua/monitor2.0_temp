@@ -1,6 +1,6 @@
 #include <windows.h>
 
-IDI_ICON1	ICON	DISCARDABLE	"F:\\TL_files_BY\\_gitee\\monitor2.0_temp\\monitor_temp\\temp.ico"
+IDI_ICON1	ICON	DISCARDABLE	"F:\\TL_files_BY\\_gitee\\monitor2.0_temp\\temp.ico"
 
 VS_VERSION_INFO VERSIONINFO
 	FILEVERSION 0,0,0,0
